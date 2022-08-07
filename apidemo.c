@@ -70,7 +70,7 @@ const char *help_string =
   " int lua_type(L, int i)               LUA_T{NIL,TABLE,etc}  [-0 +0 -]    \n"
   " str lua_typename(L, int tp)          LUA_T{NIL,etc}->name  [-0 +0 -]    \n"
   " str luaL_typename(L, int i)          typename(stack[i]))   [-0 +0 -]    \n"
-  "                                                                         \n"
+  " int lua_absindex(L,int i)            return absolute index [-0,+0,–]    \n"
   " int luaL_optint(L, int n, int d)     int(stack[n]) or d    [-0 +0 v]    \n"
   " --- luaL_optinteger(L, int n, l_I d) l_I(stack[n]) or d    [-0 +0 v]    \n"
   " --- luaL_optlong(L, int n, long d)   long(stack[n]) or d   [-0 +0 v]    \n"
@@ -679,6 +679,7 @@ static int demo_luaL_newstate(lua_State *L) {
 // ### Wrappers around C API functions defined using the above macros.
 
 // Please keep these alphabetized by API function name.
+fn_int_in_int_out      (lua_absindex)
 fn_int_int_in          (lua_call);
 fn_int_in_int_out      (lua_checkstack);
 fn_int_in              (lua_concat);
@@ -861,6 +862,7 @@ static int setup_globals(lua_State *L) {
   register_fn(luaL_newstate);
 
   // Please keep these alphabetized.
+  register_fn(lua_absindex);
   register_fn(lua_call);
   register_fn(lua_checkstack);
   register_fn(lua_concat);
