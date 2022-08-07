@@ -699,7 +699,7 @@ fn_int_in_int_out      (lua_isstring);
 fn_int_in_int_out      (lua_istable);
 fn_nothing_in          (lua_newtable);
 fn_int_in_int_out      (lua_next);
-fn_int_in              (lua_pop);
+//NOTE: Implemented below (lua_pop)
 fn_int_in              (lua_pushboolean);
 fn_string_int_in       (lua_pushlstring);
 fn_nothing_in          (lua_pushnil);
@@ -765,6 +765,20 @@ int demo_lua_error(lua_State *L) {
   save_state(L, 1);   // 1 --> tail values to omit
   return lua_error(L);
 }
+int demo_lua_pop(lua_State *L) {
+    FakeLuaState *demo_state =(FakeLuaState *)luaL_checkudata(L, 1, "ApiDemo.LuaState");;           \
+    int arg1 = (lua_Integer)(luaL_checkinteger(L, 2));
+    load_state(L, demo_state);
+    int num_elements=lua_gettop(L);
+    if (arg1>num_elements){
+        lua_settop(L,0);
+    }else{
+    lua_settop(L, -(arg1)-1);
+    }
+    print_stack(L, 0);
+    save_state(L, 0);
+    return 0;
+  }
 
 int demo_lua_tolstring(lua_State *L) {
   FakeLuaState *demo_state =
