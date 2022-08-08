@@ -112,7 +112,7 @@ const char *help_string =
   " int lua_equal(L, int i, int j)       1 if stk[i] == stk[j] [-0 +0 e]    \n"
   " int lua_lessthan(L, int i, int j)    1 if stk[i] < stk[j]  [-0 +0 e]    \n"
   " int lua_rawequal(L, int i, int j)    equal?; no metacalls  [-0 +0 -]    \n"
-  "                                                                         \n"
+  " int lua_arith(L,int op)              Math operations       [-(2|1),+1,e]    \n"
   "                                                                         \n"
   "-- function calls ------------------------------------------------------ \n"
   "                                                                         \n"
