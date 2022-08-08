@@ -622,6 +622,11 @@ static int demo_luaL_newstate(lua_State *L) {
     int arg1 = luaL_checkint(L, 2);  \
     fn_end_1_arg(lua_fn_name)
 
+#define fn_lint_in(lua_fn_name)       \
+    fn_start(lua_fn_name);           \
+    lua_Integer arg1 = luaL_checkint(L, 2);  \
+    fn_end_1_arg(lua_fn_name)
+
 #define fn_string_in(lua_fn_name)                \
     fn_start(lua_fn_name);                       \
     const char *arg1 = luaL_checkstring(L, 2);   \
@@ -680,6 +685,7 @@ static int demo_luaL_newstate(lua_State *L) {
 
 // Please keep these alphabetized by API function name.
 fn_int_in_int_out      (lua_absindex)
+fn_int_in              (lua_arith)
 fn_int_int_in          (lua_call);
 fn_int_in_int_out      (lua_checkstack);
 fn_int_in              (lua_concat);
@@ -863,6 +869,7 @@ static int setup_globals(lua_State *L) {
 
   // Please keep these alphabetized.
   register_fn(lua_absindex);
+  register_fn(lua_arith);
   register_fn(lua_call);
   register_fn(lua_checkstack);
   register_fn(lua_concat);
@@ -958,6 +965,21 @@ static int setup_globals(lua_State *L) {
   register_const(LUA_TFUNCTION);
   register_const(LUA_TUSERDATA);
   register_const(LUA_TTHREAD);
+
+  register_const( LUA_OPADD ) /* ORDER TM, ORDER OP */
+  register_const( LUA_OPSUB )
+  register_const( LUA_OPMUL )
+  register_const( LUA_OPMOD )
+  register_const( LUA_OPPOW )
+  register_const( LUA_OPDIV )
+  register_const( LUA_OPIDIV)
+  register_const( LUA_OPBAND)
+  register_const( LUA_OPBOR )
+  register_const( LUA_OPBXOR)
+  register_const( LUA_OPSHL )
+  register_const( LUA_OPSHR )
+  register_const( LUA_OPUNM )
+  register_const( LUA_OPBNOT)
 
   register_const(LUA_REGISTRYINDEX);
 #if LUA_VERSION_NUM == 501
