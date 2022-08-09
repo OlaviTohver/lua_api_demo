@@ -31,7 +31,7 @@ const char *help_string =
   "                                                                         \n"
   "     lua_pushboolean(L, int)                                [-0 +1 -]    \n"
   " --- lua_pushfstring(L, str, ...)                           [-0 +1 m]    \n"
-  " --- lua_pushinteger(L, lua_Integer)                        [-0 +1 -]    \n"
+  "     lua_pushinteger(L, lua_Integer)                        [-0 +1 -]    \n"
   "     lua_pushlstring(L, str, size_t)                        [-0 +1 m]    \n"
   "     lua_pushnil(L)                                         [-0 +1 -]    \n"
   "     lua_pushnumber(L, lua_Number)                          [-0 +1 -]    \n"
@@ -47,7 +47,7 @@ const char *help_string =
   "     lua_remove(L, int i)             rm i                  [-1 +0 -]    \n"
   "     lua_replace(L, int i)            rm i, mv top -> i     [-1 +0 -]    \n"
   "     lua_settop(L, int)               set stack size        [-? +? -]    \n"
-  "                                                                         \n"
+  "     lua_copy(L,int from, int to)   cp stk[from] -> stk[to] [-0,+0,–]    \n"
   "                                                                         \n"
   "-- reading values from the stack --------------------------------------- \n"
   "                                                                         \n"
@@ -689,6 +689,7 @@ fn_int_in              (lua_arith)
 fn_int_int_in          (lua_call);
 fn_int_in_int_out      (lua_checkstack);
 fn_int_in              (lua_concat);
+fn_int_int_in          (lua_copy);
 fn_int_string_in       (lua_getfield);
 fn_string_in           (lua_getglobal);
 fn_int_in_int_out      (lua_getmetatable);
@@ -709,6 +710,7 @@ fn_int_in_int_out      (lua_next);
 //NOTE: Implemented below (lua_pop)
 fn_int_in              (lua_pushboolean);
 fn_string_int_in       (lua_pushlstring);
+fn_lint_in             (lua_pushinteger);
 fn_nothing_in          (lua_pushnil);
 fn_number_in           (lua_pushnumber);
 fn_string_in           (lua_pushstring);
@@ -873,6 +875,7 @@ static int setup_globals(lua_State *L) {
   register_fn(lua_call);
   register_fn(lua_checkstack);
   register_fn(lua_concat);
+  register_fn(lua_copy);
   register_fn(lua_getfield);
   register_fn(lua_getglobal);
   register_fn(lua_getmetatable);
@@ -894,6 +897,7 @@ static int setup_globals(lua_State *L) {
   register_fn(lua_pop);
   register_fn(lua_pushboolean);
   register_fn(lua_pushlstring);
+  register_fn(lua_pushinteger);
   register_fn(lua_pushnil);
   register_fn(lua_pushnumber);
   register_fn(lua_pushstring);
