@@ -21,7 +21,8 @@
 
 #define states_table_key     "ApiDemo.SavedStates"
 #define demo_state_metatable "ApiDemo.LuaState"
-
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_RESET "\x1b[0m"
 
 // # The help string.
 
@@ -244,7 +245,7 @@ static void print_table(lua_State *L, int i) {
   // Ensure i is an absolute index as we'll be pushing/popping things after it.
   if (i < 0) i = lua_gettop(L) + i + 1;
 
-  const char *prefix = "{";
+  const char *prefix = "{\n";
   if (is_seq(L, i)) {
     print_seq(L, i);  // This case includes all empty tables.
   } else {
@@ -254,15 +255,30 @@ static void print_table(lua_State *L, int i) {
     while (lua_next(L, i)) {
       printf("%s", prefix);
         // stack = [.., key, value]
-      print_item(L, -2, 1);  // 1 --> as_key
+      if (lua_type(L,-1)==LUA_TTABLE){
+        print_item(L,-2,1);
+      }else{
+        printf("\t");
+        print_item(L,-2,1);
+      }
       printf(" = ");
-      print_item(L, -1, 0);  // 0 --> as_key
+      if (lua_type(L,-1)== LUA_TTABLE && lua_type(L,-2)==LUA_TSTRING && (!strcmp(lua_tostring(L,-2),"_G") || !strcmp(lua_tostring(L,-2),"package"))){
+          const char *addr = lua_pushfstring (L, "%p", lua_topointer (L, -1));
+          // stack = [{tbl}, key, value,id ]
+          const char * table_name=lua_tostring(L,-3);
+          // stack = [{tbl}, key, value,id ]
+          lua_setfield(L,LUA_REGISTRYINDEX,lua_tostring(L,-3));
+          // stack = [{tbl}, key, value]
+          printf ("%s:%s",table_name,addr);
+      }else{
+              print_item(L,-1,0);
+      }
       lua_pop(L, 1);  // So the last-used key is on top.
         // stack = [.., key]
-      prefix = ", ";
+      prefix = ",\n";
     }
         // stack = [..]
-    printf("}");
+    printf("\n}");
   }
 }
 
@@ -358,11 +374,12 @@ static void print_item(lua_State *L, int i, int as_key) {
 
 static void print_stack(lua_State *L, int omit) {
   int n = lua_gettop(L) - omit;
-  printf("stack:");
+  printf("stack:\n");
   int i;
   for (i = 1; i <= n; ++i) {
-    printf(" ");
+    printf (ANSI_COLOR_BLUE "[%d] " ANSI_COLOR_RESET,i);
     print_item(L, i, 0);  // 0 --> as_key
+    printf("\n");
   }
   if (n == 0) printf(" <empty>");
   printf("\n");
@@ -685,54 +702,76 @@ static int demo_luaL_newstate(lua_State *L) {
 
 // Please keep these alphabetized by API function name.
 fn_int_in_int_out      (lua_absindex)
+//TODO:Not implemented (lua_Alloc)
 fn_int_in              (lua_arith)
-fn_int_int_in          (lua_call);
-fn_int_in_int_out      (lua_checkstack);
-fn_int_in              (lua_concat);
-fn_int_int_in          (lua_copy);
-fn_int_string_in       (lua_getfield);
-fn_string_in           (lua_getglobal);
-fn_int_in_int_out      (lua_getmetatable);
-fn_int_in              (lua_gettable);
-fn_nothing_in_int_out  (lua_gettop);
-// Defined below:       lua_error
-fn_int_in              (lua_insert);
-fn_int_in_int_out      (lua_isboolean);
-fn_int_in_int_out      (lua_isfunction);
-fn_int_in_int_out      (lua_isnil);
-fn_int_in_int_out      (lua_isnone);
-fn_int_in_int_out      (lua_isnoneornil);
-fn_int_in_int_out      (lua_isnumber);
-fn_int_in_int_out      (lua_isstring);
-fn_int_in_int_out      (lua_istable);
-fn_nothing_in          (lua_newtable);
-fn_int_in_int_out      (lua_next);
+//TODO:Not implemented (lua_atpanic)
+fn_int_int_in          (lua_call)
+//TODO:Not implemented (lua_callk)
+//TODO:Not implemented (lua_CFunction)
+fn_int_in_int_out      (lua_checkstack)
+//TODO:Not implemented (lua_close)
+//TODO:Not implemented (lua_closeslot)
+//TODO:Not implemented (lua_compare)
+fn_int_in              (lua_concat)
+fn_int_int_in          (lua_copy)
+fn_int_int_in          (lua_createtable)
+//TODO:Not implemented (lua_dump)
+// Defined below:      lua_error
+//TODO:Not implemented (lua_gc)
+//TODO:Not implemented (lua_getallocf)
+fn_int_string_in       (lua_getfield)
+//TODO:Not implemented (lua_getextraspace)
+fn_string_in           (lua_getglobal)
+//TODO:Not implemented (lua_geti)
+fn_int_in_int_out      (lua_getmetatable)
+fn_int_in              (lua_gettable)
+fn_nothing_in_int_out  (lua_gettop)
+//TODO:Not implemented (lua_getiuservalue)
+fn_int_in              (lua_insert)
+fn_int_in_int_out      (lua_isboolean)
+//TODO:Not implemented (iscfunction)
+fn_int_in_int_out      (lua_isfunction)
+//TODO:Not implemented (isinteger)
+//TODO:Not implemented (islightuserdata)
+fn_int_in_int_out      (lua_isnil)
+fn_int_in_int_out      (lua_isnone)
+fn_int_in_int_out      (lua_isnoneornil)
+fn_int_in_int_out      (lua_isnumber)
+fn_int_in_int_out      (lua_isstring)
+fn_int_in_int_out      (lua_istable)
+//TODO:Not implemented (isthread)
+//TODO:Not implemented (isuserdata)
+//TODO:Not implemented (lua_isyieldable)
+//TODO:Not implemented (lua_KFunction)
+fn_int_in              (lua_len)
+fn_nothing_in          (lua_newtable)
+fn_int_in_int_out      (lua_next)
 //NOTE: Implemented below (lua_pop)
-fn_int_in              (lua_pushboolean);
-fn_string_int_in       (lua_pushlstring);
-fn_lint_in             (lua_pushinteger);
-fn_nothing_in          (lua_pushnil);
-fn_number_in           (lua_pushnumber);
-fn_string_in           (lua_pushstring);
-fn_int_in              (lua_pushvalue);
-fn_int_int_in          (lua_rawequal);
-fn_int_in              (lua_rawget);
-fn_int_int_in          (lua_rawgeti);
-fn_int_in              (lua_rawset);
-fn_int_int_in          (lua_rawseti);
-fn_int_in              (lua_remove);
-fn_int_in              (lua_replace);
-fn_int_string_in       (lua_setfield);
-fn_string_in           (lua_setglobal);
-fn_int_in_int_out      (lua_setmetatable);
-fn_int_in              (lua_settable);
-fn_int_in              (lua_settop);
-fn_int_in_int_out      (lua_toboolean);
-fn_int_in_int_out      (lua_tointeger);
-fn_int_in_double_out   (lua_tonumber);
-fn_int_in_string_out   (lua_tostring);
-fn_int_in_int_out      (lua_type);
-fn_int_in_string_out   (lua_typename);
+fn_int_in              (lua_pushboolean)
+fn_string_int_in       (lua_pushlstring)
+fn_lint_in             (lua_pushinteger)
+fn_nothing_in          (lua_pushnil)
+fn_number_in           (lua_pushnumber)
+fn_string_in           (lua_pushstring)
+fn_int_in              (lua_pushvalue)
+fn_int_int_in          (lua_rawequal)
+fn_int_in              (lua_rawget)
+fn_int_int_in          (lua_rawgeti)
+fn_int_in              (lua_rawset)
+fn_int_int_in          (lua_rawseti)
+fn_int_in              (lua_remove)
+fn_int_in              (lua_replace)
+fn_int_string_in       (lua_setfield)
+fn_string_in           (lua_setglobal)
+fn_int_in_int_out      (lua_setmetatable)
+fn_int_in              (lua_settable)
+fn_int_in              (lua_settop)
+fn_int_in_int_out      (lua_toboolean)
+fn_int_in_int_out      (lua_tointeger)
+fn_int_in_double_out   (lua_tonumber)
+fn_int_in_string_out   (lua_tostring)
+fn_int_in_int_out      (lua_type)
+fn_int_in_string_out   (lua_typename)
 
 // Version-specific functions.
 
@@ -876,12 +915,13 @@ static int setup_globals(lua_State *L) {
   register_fn(lua_checkstack);
   register_fn(lua_concat);
   register_fn(lua_copy);
+  register_fn(lua_createtable);
+  register_fn(lua_error);
   register_fn(lua_getfield);
   register_fn(lua_getglobal);
   register_fn(lua_getmetatable);
   register_fn(lua_gettable);
   register_fn(lua_gettop);
-  register_fn(lua_error);
   register_fn(lua_insert);
   register_fn(lua_isboolean);
   register_fn(lua_isfunction);
@@ -891,13 +931,14 @@ static int setup_globals(lua_State *L) {
   register_fn(lua_isnumber);
   register_fn(lua_isstring);
   register_fn(lua_istable);
+  register_fn(lua_len);
   register_fn(lua_newtable);
   register_fn(lua_next);
   register_fn(lua_pcall);
   register_fn(lua_pop);
   register_fn(lua_pushboolean);
-  register_fn(lua_pushlstring);
   register_fn(lua_pushinteger);
+  register_fn(lua_pushlstring);
   register_fn(lua_pushnil);
   register_fn(lua_pushnumber);
   register_fn(lua_pushstring);
