@@ -103,7 +103,7 @@ const char *help_string =
   "                                                                         \n"
   "     lua_setglobal(L, str name)       pops v; _G[name]=v    [-1 +0 e]    \n"
   "     lua_getglobal(L, str name)       pushes _G[name]       [-0 +1 e]    \n"
-  "                                                                         \n"
+  "     lua_geti(L,int index, l_I i)      pushes index[i]       [-0 +1 e]    \n"
   " int luaL_getmetafield(L, int i, str) +mt(stk[i])[s] if any [-1 +0|1 e]  \n"
   "                                                                         \n"
   "                                                                         \n"
@@ -722,7 +722,7 @@ fn_int_int_in          (lua_createtable)
 fn_int_string_in       (lua_getfield)
 //TODO:Not implemented (lua_getextraspace)
 fn_string_in           (lua_getglobal)
-//TODO:Not implemented (lua_geti)
+fn_int_int_in          (lua_geti)
 fn_int_in_int_out      (lua_getmetatable)
 fn_int_in              (lua_gettable)
 fn_nothing_in_int_out  (lua_gettop)
@@ -919,6 +919,7 @@ static int setup_globals(lua_State *L) {
   register_fn(lua_error);
   register_fn(lua_getfield);
   register_fn(lua_getglobal);
+  register_fn(lua_geti);
   register_fn(lua_getmetatable);
   register_fn(lua_gettable);
   register_fn(lua_gettop);
